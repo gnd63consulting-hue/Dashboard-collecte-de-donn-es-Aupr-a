@@ -1,31 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Récupération des variables d'environnement
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+// Credentials hardcodés - les variables d'environnement Vercel ne fonctionnent pas
+const supabaseUrl = 'https://fdmdfzzluklmkchcsjha.supabase.co'
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZkbWRmenpsdWtsbWtjaGNzamhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkzMDQxOTgsImV4cCI6MjA4NDg4MDE5OH0.TPaPlHezyzbvvpTxHG_-CIoN-LT5chU7Pry3HM3hS6w'
 
-// Log de debug (visible dans la console navigateur)
-console.log('🔍 Supabase Config Check:', {
-  url: supabaseUrl ? `${supabaseUrl.substring(0, 30)}...` : 'MISSING',
-  keyExists: !!supabaseAnonKey,
-  keyLength: supabaseAnonKey ? supabaseAnonKey.length : 0,
-  mode: import.meta.env.MODE,
-  prod: import.meta.env.PROD
-})
+export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-// Validation des credentials
-if (!supabaseUrl) {
-  console.error('❌ VITE_SUPABASE_URL is missing!')
-}
-if (!supabaseAnonKey) {
-  console.error('❌ VITE_SUPABASE_ANON_KEY is missing!')
-}
-
-// Création du client Supabase
-export const supabase = createClient(
-  supabaseUrl || '',
-  supabaseAnonKey || ''
-)
+console.log('✅ Supabase client initialized with hardcoded credentials')
 
 // Nom de la table
 export const LEADS_TABLE = 'leads_succession'
