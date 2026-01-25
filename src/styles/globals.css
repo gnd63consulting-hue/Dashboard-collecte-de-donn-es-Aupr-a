@@ -6,8 +6,10 @@
 :root {
   --auprea-gold: #D4AF37;
   --auprea-gold-light: #F4E4BC;
+  --auprea-gold-dark: #B8962E;
   --auprea-navy: #1E3A5F;
   --auprea-navy-dark: #0F1E33;
+  --auprea-navy-deeper: #0A1628;
   --auprea-white: #FFFFFF;
   --auprea-gray-light: #F8FAFC;
   --auprea-gray: #E2E8F0;
@@ -17,7 +19,7 @@
   --auprea-info: #3B82F6;
 
   --gradient-gold: linear-gradient(135deg, #D4AF37 0%, #F4E4BC 50%, #D4AF37 100%);
-  --gradient-navy: linear-gradient(135deg, #1E3A5F 0%, #0F1E33 100%);
+  --gradient-navy: linear-gradient(145deg, #0F1E33 0%, #1E3A5F 100%);
   --gradient-glow: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
 }
 
@@ -53,7 +55,335 @@ body {
   z-index: 0;
 }
 
-/* Navy Glassmorphism Card - Main Style */
+/* ============================================
+   MODERN STAT CARDS - Inspired by Lead Analytics
+   ============================================ */
+
+.stat-card {
+  background: linear-gradient(145deg, rgba(15, 30, 51, 0.98) 0%, rgba(30, 58, 95, 0.95) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(212, 175, 55, 0.12);
+  border-radius: 20px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  color: white;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.4), transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.stat-card:hover {
+  border-color: rgba(212, 175, 55, 0.35);
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.4),
+    0 0 40px rgba(212, 175, 55, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.stat-card:hover::before {
+  opacity: 1;
+}
+
+/* Gold variant */
+.stat-card-gold {
+  border-color: rgba(212, 175, 55, 0.25);
+  background: linear-gradient(145deg, rgba(15, 30, 51, 0.98) 0%, rgba(25, 48, 78, 0.96) 100%);
+}
+
+.stat-card-gold::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at top right, rgba(212, 175, 55, 0.08) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Header */
+.stat-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.stat-card-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.01em;
+}
+
+/* Icon styling */
+.stat-card-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.7);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover .stat-card-icon {
+  background: rgba(255, 255, 255, 0.08);
+  transform: scale(1.05);
+}
+
+.stat-card-icon-gold {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%);
+  border-color: rgba(212, 175, 55, 0.3);
+  color: var(--auprea-gold);
+}
+
+.stat-card:hover .stat-card-icon-gold {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.25) 0%, rgba(212, 175, 55, 0.15) 100%);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+}
+
+/* Main value */
+.stat-card-value-container {
+  margin-bottom: 0.75rem;
+}
+
+.stat-card-value {
+  font-size: 2.75rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: white;
+  letter-spacing: -0.02em;
+}
+
+.stat-card-value-gold {
+  background: linear-gradient(135deg, #D4AF37 0%, #F4E4BC 50%, #D4AF37 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Change indicator */
+.stat-card-change-container {
+  margin-top: 0.5rem;
+}
+
+.stat-card-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+}
+
+.stat-card-change-positive {
+  color: var(--auprea-success);
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.stat-card-change-negative {
+  color: #EF4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.stat-card-change-neutral {
+  color: var(--auprea-gray-dark);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.stat-card-change-label {
+  color: rgba(255, 255, 255, 0.5);
+  margin-left: 0.25rem;
+  font-weight: 400;
+}
+
+/* Subtitle */
+.stat-card-subtitle {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.5rem;
+}
+
+/* Sparkline container */
+.stat-card-sparkline {
+  margin-top: 1rem;
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+  margin-bottom: -0.5rem;
+}
+
+/* Decorative elements */
+.stat-card-glow {
+  position: absolute;
+  top: -50%;
+  right: -30%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, transparent 70%);
+  pointer-events: none;
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+.stat-card-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(212, 175, 55, 0.05),
+    transparent
+  );
+  pointer-events: none;
+  transition: left 0.6s ease;
+}
+
+.stat-card:hover .stat-card-shine {
+  left: 100%;
+}
+
+/* Loading state */
+.stat-card-loading {
+  min-height: 180px;
+}
+
+/* ============================================
+   PROGRESS GAUGE - Lead Goal Progress Style
+   ============================================ */
+
+.progress-gauge-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.progress-gauge-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.5rem 0 1rem;
+}
+
+.progress-gauge-svg {
+  display: block;
+}
+
+.progress-gauge-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -30%);
+  text-align: center;
+}
+
+.progress-gauge-percentage {
+  font-size: 3rem;
+  font-weight: 700;
+  font-family: 'Inter', system-ui, sans-serif;
+  background: linear-gradient(135deg, #D4AF37 0%, #F4E4BC 50%, #D4AF37 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.progress-gauge-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 0.25rem;
+}
+
+.progress-gauge-sublabel {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Bottom stats */
+.progress-gauge-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.progress-gauge-stat {
+  text-align: center;
+}
+
+.progress-gauge-stat-value {
+  font-size: 1.25rem;
+  font-weight: 600;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: white;
+}
+
+.progress-gauge-stat-value-gold {
+  color: var(--auprea-gold);
+}
+
+.progress-gauge-stat-label {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 0.15rem;
+}
+
+.progress-gauge-divider {
+  width: 1px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Badges */
+.progress-gauge-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.progress-gauge-badge-success {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--auprea-success);
+}
+
+.progress-gauge-badge-gold {
+  background: rgba(212, 175, 55, 0.12);
+  color: var(--auprea-gold);
+}
+
+/* ============================================
+   LEGACY GLASS CARD (for other components)
+   ============================================ */
+
 .glass-card {
   background: linear-gradient(145deg, rgba(15, 30, 51, 0.95) 0%, rgba(30, 58, 95, 0.92) 100%);
   backdrop-filter: blur(20px);
@@ -69,7 +399,6 @@ body {
   overflow: hidden;
 }
 
-/* Card inner glow */
 .glass-card::before {
   content: '';
   position: absolute;
@@ -96,6 +425,10 @@ body {
   opacity: 1;
 }
 
+/* ============================================
+   ANIMATIONS & EFFECTS
+   ============================================ */
+
 /* Gold Glow Effects */
 .gold-glow {
   box-shadow:
@@ -108,55 +441,6 @@ body {
   box-shadow:
     0 0 15px rgba(212, 175, 55, 0.25),
     0 0 30px rgba(212, 175, 55, 0.1);
-}
-
-/* Animated Gold Border on Hover */
-.gradient-border {
-  position: relative;
-  background: var(--gradient-navy) padding-box,
-              linear-gradient(135deg, var(--auprea-gold) 0%, rgba(212, 175, 55, 0.3) 50%, var(--auprea-gold) 100%) border-box;
-  border: 2px solid transparent;
-  border-radius: 20px;
-}
-
-/* Rotating Gradient Border Animation */
-.animated-border {
-  position: relative;
-  border-radius: 20px;
-  overflow: hidden;
-}
-
-.animated-border::before {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  background: conic-gradient(
-    from 0deg,
-    var(--auprea-gold),
-    transparent 60deg,
-    transparent 180deg,
-    var(--auprea-gold) 240deg,
-    transparent 300deg,
-    var(--auprea-gold)
-  );
-  border-radius: inherit;
-  animation: rotate-border 6s linear infinite;
-  z-index: -1;
-}
-
-.animated-border::after {
-  content: '';
-  position: absolute;
-  inset: 2px;
-  background: var(--gradient-navy);
-  border-radius: calc(20px - 2px);
-  z-index: -1;
-}
-
-@keyframes rotate-border {
-  100% {
-    transform: rotate(360deg);
-  }
 }
 
 /* Live Pulse Animation */
@@ -230,10 +514,22 @@ body {
   }
 }
 
+/* Glow Pulse */
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
 /* Number Counter */
 .counter-animate {
   font-variant-numeric: tabular-nums;
-  font-family: 'JetBrains Mono', 'SF Mono', monospace;
+  font-family: 'Inter', system-ui, sans-serif;
   letter-spacing: -0.02em;
 }
 
@@ -259,6 +555,10 @@ body {
   }
 }
 
+/* ============================================
+   CHART STYLING
+   ============================================ */
+
 /* Chart Tooltip */
 .recharts-tooltip-wrapper {
   outline: none;
@@ -275,7 +575,10 @@ body {
     0 0 20px rgba(212, 175, 55, 0.15);
 }
 
-/* Scrollbar - Light Theme */
+/* ============================================
+   SCROLLBAR & SELECTION
+   ============================================ */
+
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -308,7 +611,11 @@ body {
   outline-offset: 3px;
 }
 
-/* Utility: Gold Text Gradient */
+/* ============================================
+   TEXT & UTILITY CLASSES
+   ============================================ */
+
+/* Gold Text Gradient */
 .text-gradient-gold {
   background: linear-gradient(135deg, #D4AF37 0%, #F4E4BC 40%, #D4AF37 80%, #F4E4BC 100%);
   background-size: 200% auto;
@@ -329,7 +636,10 @@ body {
   background: linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(244, 228, 188, 0.1) 100%);
 }
 
-/* Table Row Hover */
+/* ============================================
+   TABLE STYLING
+   ============================================ */
+
 .table-row-hover {
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -364,29 +674,10 @@ body {
   }
 }
 
-/* Card Icon Background */
-.icon-bg {
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%);
-  border: 1px solid rgba(212, 175, 55, 0.3);
-}
+/* ============================================
+   BADGES
+   ============================================ */
 
-/* Glow Orb Animation */
-.glow-orb {
-  animation: glow-pulse 4s ease-in-out infinite;
-}
-
-@keyframes glow-pulse {
-  0%, 100% {
-    opacity: 0.3;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.5;
-    transform: scale(1.1);
-  }
-}
-
-/* Premium Badge Style */
 .premium-badge {
   background: linear-gradient(135deg, var(--auprea-gold) 0%, var(--auprea-gold-light) 50%, var(--auprea-gold) 100%);
   color: var(--auprea-navy-dark);
@@ -399,8 +690,39 @@ body {
   box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
 }
 
-/* Responsive */
+/* Card Icon Background */
+.icon-bg {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+/* Glow Orb Animation */
+.glow-orb {
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
 @media (max-width: 768px) {
+  .stat-card {
+    border-radius: 16px;
+    padding: 1.25rem;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-2px);
+  }
+
+  .stat-card-value {
+    font-size: 2.25rem;
+  }
+
+  .progress-gauge-percentage {
+    font-size: 2.5rem;
+  }
+
   .glass-card {
     border-radius: 16px;
   }
@@ -412,6 +734,7 @@ body {
 
 /* High contrast mode for accessibility */
 @media (prefers-contrast: high) {
+  .stat-card,
   .glass-card {
     border-width: 2px;
   }
