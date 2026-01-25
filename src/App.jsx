@@ -18,23 +18,28 @@ import { useLeads, useLeadStats } from './hooks/useSupabase'
 function ErrorBanner({ error, onRetry }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-center justify-between"
+      initial={{ opacity: 0, y: -20, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -10 }}
+      className="mb-6 p-5 bg-gradient-to-r from-red-50 to-red-100 border-2 border-red-200 rounded-2xl flex items-center justify-between shadow-lg shadow-red-100/50"
     >
-      <div className="flex items-center gap-3">
-        <AlertCircle className="w-5 h-5 text-red-400" />
+      <div className="flex items-center gap-4">
+        <div className="p-3 bg-red-500 rounded-xl shadow-lg shadow-red-500/30">
+          <AlertCircle className="w-6 h-6 text-white" />
+        </div>
         <div>
-          <p className="text-red-400 font-medium">Erreur de connexion</p>
-          <p className="text-sm text-gray-dark">{error}</p>
+          <p className="text-red-700 font-semibold text-lg">Erreur de connexion</p>
+          <p className="text-red-600/80 text-sm mt-1">{error}</p>
         </div>
       </div>
-      <button
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
         onClick={onRetry}
-        className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded-lg text-sm transition-colors"
+        className="px-5 py-2.5 bg-red-500 hover:bg-red-600 text-white font-medium rounded-xl text-sm transition-all shadow-lg shadow-red-500/30 hover:shadow-red-500/40"
       >
         Réessayer
-      </button>
+      </motion.button>
     </motion.div>
   )
 }
