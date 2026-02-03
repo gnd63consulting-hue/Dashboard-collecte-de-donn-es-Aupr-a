@@ -108,7 +108,20 @@ export function useLeadStats(leads) {
     bestDay: '',
     bestHour: '',
     estimatedDaysTo10K: 0,
-    weeklySparkline: []
+    weeklySparkline: [],
+    // New score statistics
+    scoreStats: {
+      avgUrgence: 0,
+      avgComplexite: 0,
+      avgPotentiel: 0,
+      avgGlobal: 0,
+      totalAnalysed: 0,
+      totalLeads: 0
+    },
+    // Accompaniment type distribution
+    accompagnementDistribution: [],
+    // Profile distribution
+    profilDistribution: []
   })
 
   useEffect(() => {
@@ -255,6 +268,105 @@ export function useLeadStats(leads) {
       ? Math.round((accompagnementCount / leads.length) * 100)
       : 0
 
+    // === NEW: Score Statistics ===
+    let totalUrgence = 0
+    let totalComplexite = 0
+    let totalPotentiel = 0
+    let analysedCount = 0
+
+    // Accompaniment type distribution
+    const accompagnementTypeMap = new Map()
+
+    // Profile distribution
+    const profilMap = new Map()
+
+    leads.forEach(lead => {
+      // Count scores for analysed leads
+      if (lead.analysed_at || lead.score_urgence !== null) {
+        analysedCount++
+        totalUrgence += lead.score_urgence || 0
+        totalComplexite += lead.score_complexite || 0
+        totalPotentiel += lead.score_potentiel || 0
+      }
+
+      // Count accompaniment types
+      const accompType = lead.accompagnement_souhaite || 'Non renseigné'
+      accompagnementTypeMap.set(accompType, (accompagnementTypeMap.get(accompType) || 0) + 1)
+
+      // Count profiles
+      if (lead.profil_psychologique) {
+        profilMap.set(lead.profil_psychologique, (profilMap.get(lead.profil_psychologique) || 0) + 1)
+      }
+    })
+
+    // Calculate averages
+    const avgUrgence = analysedCount > 0 ? Math.round(totalUrgence / analysedCount) : 0
+    const avgComplexite = analysedCount > 0 ? Math.round(totalComplexite / analysedCount) : 0
+    const avgPotentiel = analysedCount > 0 ? Math.round(totalPotentiel / analysedCount) : 0
+    // Global score = (urgence × 0.4 + potentiel × 0.35 + complexité × 0.25)
+    const avgGlobal = analysedCount > 0
+      ? Math.round(avgUrgence * 0.4 + avgPotentiel * 0.35 + avgComplexite * 0.25)
+      : 0
+
+    const scoreStats = {
+      avgUrgence,
+      avgComplexite,
+      avgPotentiel,
+      avgGlobal,
+      totalAnalysed: analysedCount,
+      totalLeads: leads.length
+    }
+
+    // Format accompaniment distribution - order with "Coordinateur AUPREA" first
+    const accompagnementOrder = [
+      'Coordinateur AUPREA',
+      'Notaire',
+      'Avocat',
+      'CGP',
+      'Autre',
+      'Non',
+      'Non renseigné'
+    ]
+
+    const accompagnementDistribution = accompagnementOrder
+      .filter(type => accompagnementTypeMap.has(type))
+      .map(type => ({
+        type,
+        count: accompagnementTypeMap.get(type),
+        percentage: Math.round((accompagnementTypeMap.get(type) / leads.length) * 100)
+      }))
+
+    // Add any other types not in the predefined order
+    accompagnementTypeMap.forEach((count, type) => {
+      if (!accompagnementOrder.includes(type)) {
+        accompagnementDistribution.push({
+          type,
+          count,
+          percentage: Math.round((count / leads.length) * 100)
+        })
+      }
+    })
+
+    // Format profile distribution
+    const profilOrder = [
+      'Le Pressé ⚡',
+      'Le Prévoyant ✅',
+      'Le Déni 🙈',
+      "L'Inquiet 😰",
+      'Le Méthodique 📋',
+      "L'Héritier 👨‍👩‍👧‍👦"
+    ]
+
+    const profilDistribution = profilOrder
+      .map(profil => ({
+        profil,
+        count: profilMap.get(profil) || 0,
+        percentage: profilMap.get(profil)
+          ? Math.round((profilMap.get(profil) / analysedCount) * 100)
+          : 0
+      }))
+      .filter(p => p.count > 0)
+
     setStats({
       total: leads.length,
       today: todayCount,
@@ -271,7 +383,11 @@ export function useLeadStats(leads) {
       bestDay,
       bestHour,
       estimatedDaysTo10K: isFinite(estimatedDaysTo10K) ? estimatedDaysTo10K : 0,
-      weeklySparkline
+      weeklySparkline,
+      // New statistics
+      scoreStats,
+      accompagnementDistribution,
+      profilDistribution
     })
   }, [leads])
 

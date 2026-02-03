@@ -5,6 +5,9 @@ import { Users, Calendar, TrendingUp, AlertCircle } from 'lucide-react'
 import Header from './components/Header'
 import KPICard from './components/KPICard'
 import ProgressGauge from './components/ProgressGauge'
+import ScoreGauges from './components/ScoreGauges'
+import AccompagnementChart from './components/AccompagnementChart'
+import ProfilChart from './components/ProfilChart'
 import LeadsChart from './components/LeadsChart'
 import WeekdayChart from './components/WeekdayChart'
 import HeatmapChart from './components/HeatmapChart'
@@ -107,6 +110,14 @@ function App() {
           />
         </div>
 
+        {/* Score Gauges - Charles' Request #1 */}
+        <div className="mb-6">
+          <ScoreGauges
+            scoreStats={stats.scoreStats}
+            loading={loading}
+          />
+        </div>
+
         {/* Charts Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           {/* Main chart - takes 2 columns */}
@@ -136,6 +147,20 @@ function App() {
           <AIInsights
             stats={stats}
             loading={loading}
+          />
+        </div>
+
+        {/* Third Row - Accompaniment and Profile Distribution - Charles' Request #2 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+          <AccompagnementChart
+            data={stats.accompagnementDistribution}
+            loading={loading}
+            delay={0.4}
+          />
+          <ProfilChart
+            data={stats.profilDistribution}
+            loading={loading}
+            delay={0.5}
           />
         </div>
 
