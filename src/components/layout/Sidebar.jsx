@@ -51,10 +51,17 @@ function NavItem({ item, collapsed, unanalysedCount, onClick }) {
   const isActive = location.pathname === item.path
   const showBadge = item.badge === 'unanalysed' && unanalysedCount > 0
 
+  const handleClick = (e) => {
+    if (onClick) {
+      onClick(e)
+    }
+  }
+
   return (
     <NavLink
       to={item.path}
-      onClick={onClick}
+      onClick={handleClick}
+      onPointerDown={onClick}
       className={`
         flex items-center gap-3 px-4 py-3 mx-2 rounded-xl transition-all duration-200
         ${isActive

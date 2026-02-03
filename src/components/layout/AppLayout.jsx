@@ -1,4 +1,4 @@
-import { useState, createContext, useContext, useEffect } from 'react'
+import { useState, createContext, useContext, useEffect, useCallback } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import { useLeads } from '../../hooks/useSupabase'
@@ -24,7 +24,7 @@ export default function AppLayout() {
       const mobile = window.innerWidth < 768
       setIsMobile(mobile)
       if (mobile) {
-        setMobileMenuOpen(false) // Close menu when switching to mobile
+        setMobileMenuOpen(false)
       }
     }
 
@@ -43,10 +43,17 @@ export default function AppLayout() {
   // Calculate unanalysed leads count
   const unanalysedCount = leads.filter(lead => !lead.analysed_at && lead.score_urgence === null).length
 
-  // Close menu handler
-  const closeMobileMenu = () => {
+  // Close menu handler - use useCallback to ensure stable reference
+  const closeMobileMenu = useCallback(() => {
+    console.log('closeMobileMenu called')
     setMobileMenuOpen(false)
-  }
+  }, [])
+
+  // Open menu handler
+  const openMobileMenu = useCallback(() => {
+    console.log('openMobileMenu called')
+    setMobileMenuOpen(true)
+  }, [])
 
   return (
     <SidebarContext.Provider value={{ collapsed, setCollapsed, isMobile }}>
@@ -54,11 +61,12 @@ export default function AppLayout() {
         {/* Background pattern */}
         <div className="bg-pattern" />
 
-        {/* Mobile header with hamburger - always visible on mobile */}
+        {/* Mobile header with hamburger */}
         {isMobile && (
           <header className="fixed top-0 left-0 right-0 z-40 bg-auprea-navy-dark/95 backdrop-blur-sm border-b border-white/10 px-4 py-3 flex items-center justify-between">
             <button
-              onClick={() => setMobileMenuOpen(true)}
+              type="button"
+              onPointerDown={openMobileMenu}
               className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-colors"
               aria-label="Ouvrir le menu"
             >
@@ -71,17 +79,16 @@ export default function AppLayout() {
 
         {/* Mobile sidebar overlay and drawer */}
         {isMobile && mobileMenuOpen && (
-          <>
-            {/* Dark overlay - click to close (z-50) */}
+          <div className="fixed inset-0 z-50">
+            {/* Dark overlay */}
             <div
-              className="fixed inset-0 bg-black/60 z-50"
-              onClick={closeMobileMenu}
-              onTouchEnd={closeMobileMenu}
+              className="absolute inset-0 bg-black/60"
+              onPointerDown={closeMobileMenu}
               aria-hidden="true"
             />
 
-            {/* Sidebar drawer (z-[60] - higher than overlay) */}
-            <div className="fixed inset-y-0 left-0 z-[60] w-64 bg-gradient-to-b from-auprea-navy-dark to-auprea-navy border-r border-white/10 flex flex-col shadow-2xl">
+            {/* Sidebar drawer */}
+            <aside className="absolute inset-y-0 left-0 w-64 bg-gradient-to-b from-auprea-navy-dark to-auprea-navy border-r border-white/10 flex flex-col shadow-2xl">
               {/* Header with close button */}
               <div className="flex items-center justify-between px-4 py-4 border-b border-white/10">
                 <div className="flex items-center gap-3">
@@ -95,17 +102,12 @@ export default function AppLayout() {
                 </div>
                 <button
                   type="button"
-                  onClick={(e) => {
-                    e.preventDefault()
+                  onPointerDown={(e) => {
                     e.stopPropagation()
                     closeMobileMenu()
                   }}
-                  onTouchEnd={(e) => {
-                    e.preventDefault()
-                    e.stopPropagation()
-                    closeMobileMenu()
-                  }}
-                  className="p-3 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/30 text-white transition-colors touch-manipulation"
+                  className="p-3 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/30 text-white"
+                  style={{ touchAction: 'manipulation' }}
                   aria-label="Fermer le menu"
                 >
                   <X className="w-6 h-6" />
@@ -120,11 +122,11 @@ export default function AppLayout() {
                 onClose={closeMobileMenu}
                 renderAsNav={true}
               />
-            </div>
-          </>
+            </aside>
+          </div>
         )}
 
-        {/* Desktop sidebar - always visible */}
+        {/* Desktop sidebar */}
         {!isMobile && (
           <Sidebar
             unanalysedCount={unanalysedCount}
