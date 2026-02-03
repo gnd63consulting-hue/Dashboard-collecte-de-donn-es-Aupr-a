@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useMemo } from 'react'
-import { Users, Search, ChevronDown, ChevronUp, Mail, Phone, Calendar } from 'lucide-react'
+import { Users, Search, ChevronDown, ChevronUp, Mail, Phone, Calendar, Zap, TrendingUp, Brain, CheckCircle, Clock } from 'lucide-react'
 
 // Mask email for privacy
 function maskEmail(email) {
@@ -36,17 +36,109 @@ function formatDate(dateStr) {
 function AccompagnementBadge({ value }) {
   if (!value) return <span className="text-gray-dark">-</span>
 
-  const isYes = value.toLowerCase().includes('oui')
+  // Check for specific accompaniment types
+  const isCoordinateur = value.toLowerCase().includes('coordinateur')
+  const isYes = value.toLowerCase().includes('oui') || isCoordinateur
+
+  // Show the actual type if it's a specific professional
+  const displayValue = isCoordinateur ? 'AUPREA' : (isYes ? 'Oui' : 'Non')
 
   return (
     <span className={`
       inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-      ${isYes
+      ${isCoordinateur
+        ? 'bg-auprea-gold/20 text-auprea-gold'
+        : isYes
         ? 'bg-auprea-success/20 text-auprea-success'
         : 'bg-gray-dark/20 text-gray-dark'
       }
     `}>
-      {isYes ? 'Oui' : 'Non'}
+      {displayValue}
+    </span>
+  )
+}
+
+// Score badge with color coding
+function ScoreBadge({ value, type = 'default' }) {
+  if (value === null || value === undefined) {
+    return <span className="text-gray-dark text-sm">-</span>
+  }
+
+  // Color based on value: 0-40 green, 41-70 yellow, 71-100 red
+  let colorClass = 'text-auprea-success'
+  let bgClass = 'bg-auprea-success/20'
+
+  if (type === 'urgence') {
+    // For urgency, higher is more urgent (red)
+    if (value >= 71) {
+      colorClass = 'text-red-400'
+      bgClass = 'bg-red-400/20'
+    } else if (value >= 41) {
+      colorClass = 'text-auprea-warning'
+      bgClass = 'bg-auprea-warning/20'
+    }
+  } else if (type === 'potentiel') {
+    // For potential, higher is better (green)
+    if (value >= 71) {
+      colorClass = 'text-auprea-success'
+      bgClass = 'bg-auprea-success/20'
+    } else if (value >= 41) {
+      colorClass = 'text-auprea-warning'
+      bgClass = 'bg-auprea-warning/20'
+    } else {
+      colorClass = 'text-gray-dark'
+      bgClass = 'bg-gray-dark/20'
+    }
+  }
+
+  return (
+    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-mono font-semibold ${bgClass} ${colorClass}`}>
+      {value}
+    </span>
+  )
+}
+
+// Profile badge with emoji
+function ProfileBadge({ value }) {
+  if (!value) return <span className="text-gray-dark text-sm">-</span>
+
+  // Extract emoji and short name
+  const emojiMatch = value.match(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{231A}-\u{231B}]|[\u{23E9}-\u{23F3}]|[\u{23F8}-\u{23FA}]|[\u{25AA}-\u{25AB}]|[\u{25B6}]|[\u{25C0}]|[\u{25FB}-\u{25FE}]|[\u{2614}-\u{2615}]|[\u{2648}-\u{2653}]|[\u{267F}]|[\u{2693}]|[\u{26A1}]|[\u{26AA}-\u{26AB}]|[\u{26BD}-\u{26BE}]|[\u{26C4}-\u{26C5}]|[\u{26CE}]|[\u{26D4}]|[\u{26EA}]|[\u{26F2}-\u{26F3}]|[\u{26F5}]|[\u{26FA}]|[\u{26FD}]|[\u{2702}]|[\u{2705}]|[\u{2708}-\u{270D}]|[\u{270F}]|[\u{2712}]|[\u{2714}]|[\u{2716}]|[\u{271D}]|[\u{2721}]|[\u{2728}]|[\u{2733}-\u{2734}]|[\u{2744}]|[\u{2747}]|[\u{274C}]|[\u{274E}]|[\u{2753}-\u{2755}]|[\u{2757}]|[\u{2763}-\u{2764}]|[\u{2795}-\u{2797}]|[\u{27A1}]|[\u{27B0}]|[\u{27BF}]|[\u{2934}-\u{2935}]|[\u{2B05}-\u{2B07}]|[\u{2B1B}-\u{2B1C}]|[\u{2B50}]|[\u{2B55}]|[\u{3030}]|[\u{303D}]|[\u{3297}]|[\u{3299}]/gu)
+  const emoji = emojiMatch ? emojiMatch[0] : ''
+
+  // Get short name (without emoji, without "Le/L'" prefix)
+  let shortName = value.replace(/[\u{1F300}-\u{1FAFF}]/gu, '').trim()
+  shortName = shortName.replace(/^(Le |L')/i, '').trim()
+
+  return (
+    <span className="inline-flex items-center gap-1 text-sm text-white" title={value}>
+      <span>{emoji}</span>
+      <span className="hidden lg:inline truncate max-w-20">{shortName}</span>
+    </span>
+  )
+}
+
+// Analysis status badge
+function StatusBadge({ analysedAt }) {
+  const isAnalysed = !!analysedAt
+
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+      isAnalysed
+        ? 'bg-auprea-success/20 text-auprea-success'
+        : 'bg-auprea-warning/20 text-auprea-warning'
+    }`}>
+      {isAnalysed ? (
+        <>
+          <CheckCircle className="w-3 h-3" />
+          <span className="hidden sm:inline">Analysé</span>
+        </>
+      ) : (
+        <>
+          <Clock className="w-3 h-3" />
+          <span className="hidden sm:inline">En attente</span>
+        </>
+      )}
     </span>
   )
 }
@@ -169,7 +261,7 @@ export default function LeadsTable({ leads, loading = false }) {
           <thead>
             <tr className="border-b border-white/10">
               <th
-                className="px-4 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider cursor-pointer hover:text-white transition-colors"
+                className="px-3 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider cursor-pointer hover:text-white transition-colors"
                 onClick={() => toggleSort('created_at')}
               >
                 <span className="flex items-center gap-1">
@@ -179,7 +271,7 @@ export default function LeadsTable({ leads, loading = false }) {
                 </span>
               </th>
               <th
-                className="px-4 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider cursor-pointer hover:text-white transition-colors"
+                className="px-3 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider cursor-pointer hover:text-white transition-colors"
                 onClick={() => toggleSort('prenom')}
               >
                 <span className="flex items-center gap-1">
@@ -187,25 +279,56 @@ export default function LeadsTable({ leads, loading = false }) {
                   <SortIcon field="prenom" />
                 </span>
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider">
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider hidden lg:table-cell">
                 <span className="flex items-center gap-1">
                   <Mail className="w-4 h-4" />
                   Email
                 </span>
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider hidden md:table-cell">
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider hidden xl:table-cell">
                 <span className="flex items-center gap-1">
                   <Phone className="w-4 h-4" />
-                  Téléphone
+                  Tél
                 </span>
               </th>
               <th
-                className="px-4 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider cursor-pointer hover:text-white transition-colors"
+                className="px-3 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider cursor-pointer hover:text-white transition-colors hidden sm:table-cell"
                 onClick={() => toggleSort('accompagnement_souhaite')}
               >
                 <span className="flex items-center gap-1">
-                  Accompagnement
+                  Accomp.
                   <SortIcon field="accompagnement_souhaite" />
+                </span>
+              </th>
+              <th
+                className="px-3 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider cursor-pointer hover:text-white transition-colors"
+                onClick={() => toggleSort('score_urgence')}
+              >
+                <span className="flex items-center gap-1">
+                  <Zap className="w-4 h-4 text-red-400" />
+                  Urg.
+                  <SortIcon field="score_urgence" />
+                </span>
+              </th>
+              <th
+                className="px-3 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider cursor-pointer hover:text-white transition-colors hidden md:table-cell"
+                onClick={() => toggleSort('score_potentiel')}
+              >
+                <span className="flex items-center gap-1">
+                  <TrendingUp className="w-4 h-4 text-green-400" />
+                  Pot.
+                  <SortIcon field="score_potentiel" />
+                </span>
+              </th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider hidden lg:table-cell">
+                <span className="flex items-center gap-1">
+                  <Brain className="w-4 h-4 text-purple-400" />
+                  Profil
+                </span>
+              </th>
+              <th className="px-3 py-3 text-left text-xs font-medium text-gray-dark uppercase tracking-wider">
+                <span className="flex items-center gap-1">
+                  Statut
                 </span>
               </th>
             </tr>
@@ -219,30 +342,42 @@ export default function LeadsTable({ leads, loading = false }) {
                   animate={{ opacity: 1, x: 0, backgroundColor: 'transparent' }}
                   exit={{ opacity: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="table-row-hover"
+                  className="table-row-hover cursor-pointer"
                 >
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <span className="text-sm text-white font-mono">
                       {formatDate(lead.created_at || lead.date_reponse)}
                     </span>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <span className="text-sm text-white font-medium">
                       {lead.prenom || '-'}
                     </span>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap hidden lg:table-cell">
                     <span className="text-sm text-gray-dark font-mono">
                       {maskEmail(lead.email)}
                     </span>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap hidden md:table-cell">
+                  <td className="px-3 py-3 whitespace-nowrap hidden xl:table-cell">
                     <span className="text-sm text-gray-dark font-mono">
                       {maskPhone(lead.telephone)}
                     </span>
                   </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap hidden sm:table-cell">
                     <AccompagnementBadge value={lead.accompagnement_souhaite} />
+                  </td>
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <ScoreBadge value={lead.score_urgence} type="urgence" />
+                  </td>
+                  <td className="px-3 py-3 whitespace-nowrap hidden md:table-cell">
+                    <ScoreBadge value={lead.score_potentiel} type="potentiel" />
+                  </td>
+                  <td className="px-3 py-3 whitespace-nowrap hidden lg:table-cell">
+                    <ProfileBadge value={lead.profil_psychologique} />
+                  </td>
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <StatusBadge analysedAt={lead.analysed_at} />
                   </td>
                 </motion.tr>
               ))}
