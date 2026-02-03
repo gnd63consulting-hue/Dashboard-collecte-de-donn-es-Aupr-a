@@ -72,15 +72,16 @@ export default function AppLayout() {
         {/* Mobile sidebar overlay and drawer */}
         {isMobile && mobileMenuOpen && (
           <>
-            {/* Dark overlay - click to close */}
+            {/* Dark overlay - click to close (z-50) */}
             <div
               className="fixed inset-0 bg-black/60 z-50"
               onClick={closeMobileMenu}
+              onTouchEnd={closeMobileMenu}
               aria-hidden="true"
             />
 
-            {/* Sidebar drawer */}
-            <div className="fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-auprea-navy-dark to-auprea-navy border-r border-white/10 flex flex-col">
+            {/* Sidebar drawer (z-[60] - higher than overlay) */}
+            <div className="fixed inset-y-0 left-0 z-[60] w-64 bg-gradient-to-b from-auprea-navy-dark to-auprea-navy border-r border-white/10 flex flex-col shadow-2xl">
               {/* Header with close button */}
               <div className="flex items-center justify-between px-4 py-4 border-b border-white/10">
                 <div className="flex items-center gap-3">
@@ -93,11 +94,21 @@ export default function AppLayout() {
                   </div>
                 </div>
                 <button
-                  onClick={closeMobileMenu}
-                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    closeMobileMenu()
+                  }}
+                  onTouchEnd={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    closeMobileMenu()
+                  }}
+                  className="p-3 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/30 text-white transition-colors touch-manipulation"
                   aria-label="Fermer le menu"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-6 h-6" />
                 </button>
               </div>
 
