@@ -21,54 +21,64 @@ function CustomTooltip({ active, payload }) {
 function BarItem({ data, index, maxCount, isCoordinateur, delay }) {
   const percentage = maxCount > 0 ? (data.count / maxCount) * 100 : 0
 
+  // Shorter label for mobile
+  const shortLabel = data.type === 'Coordinateur AUPREA' ? 'Coord. AUPREA' :
+                     data.type === 'Non renseigné' ? 'N/A' : data.type
+
   return (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: delay + index * 0.1, duration: 0.4 }}
-      className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${
+      className={`flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 p-2 rounded-lg transition-colors ${
         isCoordinateur ? 'bg-auprea-gold/10' : 'hover:bg-white/5'
       }`}
     >
-      {/* Icon for Coordinateur AUPREA */}
-      {isCoordinateur && (
-        <Crown className="w-4 h-4 text-auprea-gold flex-shrink-0" />
-      )}
-
-      {/* Label */}
-      <span className={`w-40 text-sm truncate ${
-        isCoordinateur ? 'text-auprea-gold font-semibold' : 'text-gray-dark'
-      }`}>
-        {data.type}
-      </span>
-
-      {/* Bar */}
-      <div className="flex-1 h-6 bg-white/5 rounded-full overflow-hidden">
-        <motion.div
-          className={`h-full rounded-full ${
-            isCoordinateur
-              ? 'bg-gradient-to-r from-auprea-gold to-auprea-gold-light'
-              : 'bg-gradient-to-r from-auprea-info/70 to-auprea-info/40'
-          }`}
-          initial={{ width: 0 }}
-          animate={{ width: `${percentage}%` }}
-          transition={{ delay: delay + index * 0.1 + 0.2, duration: 0.6, ease: 'easeOut' }}
-          style={{
-            boxShadow: isCoordinateur ? '0 0 10px rgba(212, 175, 55, 0.3)' : 'none'
-          }}
-        />
+      {/* Label row on mobile */}
+      <div className="flex items-center gap-2 sm:w-32 lg:w-40">
+        {/* Icon for Coordinateur AUPREA */}
+        {isCoordinateur && (
+          <Crown className="w-4 h-4 text-auprea-gold flex-shrink-0" />
+        )}
+        {/* Label */}
+        <span className={`text-sm truncate ${
+          isCoordinateur ? 'text-auprea-gold font-semibold' : 'text-gray-dark'
+        }`}>
+          <span className="sm:hidden">{shortLabel}</span>
+          <span className="hidden sm:inline">{data.type}</span>
+        </span>
       </div>
 
-      {/* Count and percentage */}
-      <div className="flex items-center gap-2 w-24 justify-end">
-        <span className={`font-mono text-sm font-semibold ${
-          isCoordinateur ? 'text-auprea-gold' : 'text-white'
-        }`}>
-          {data.count}
-        </span>
-        <span className="text-gray-dark text-xs">
-          ({data.percentage}%)
-        </span>
+      {/* Bar and count row */}
+      <div className="flex items-center gap-2 flex-1">
+        {/* Bar */}
+        <div className="flex-1 h-5 sm:h-6 bg-white/5 rounded-full overflow-hidden">
+          <motion.div
+            className={`h-full rounded-full ${
+              isCoordinateur
+                ? 'bg-gradient-to-r from-auprea-gold to-auprea-gold-light'
+                : 'bg-gradient-to-r from-auprea-info/70 to-auprea-info/40'
+            }`}
+            initial={{ width: 0 }}
+            animate={{ width: `${percentage}%` }}
+            transition={{ delay: delay + index * 0.1 + 0.2, duration: 0.6, ease: 'easeOut' }}
+            style={{
+              boxShadow: isCoordinateur ? '0 0 10px rgba(212, 175, 55, 0.3)' : 'none'
+            }}
+          />
+        </div>
+
+        {/* Count and percentage */}
+        <div className="flex items-center gap-1 sm:gap-2 w-16 sm:w-20 justify-end flex-shrink-0">
+          <span className={`font-mono text-sm font-semibold ${
+            isCoordinateur ? 'text-auprea-gold' : 'text-white'
+          }`}>
+            {data.count}
+          </span>
+          <span className="text-gray-dark text-xs hidden sm:inline">
+            ({data.percentage}%)
+          </span>
+        </div>
       </div>
     </motion.div>
   )
@@ -125,19 +135,19 @@ export default function AccompagnementChart({ data, loading = false, delay = 0 }
       className="glass-card p-6"
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-auprea-info/20 rounded-lg">
+          <div className="p-2 bg-auprea-info/20 rounded-lg flex-shrink-0">
             <Briefcase className="w-5 h-5 text-auprea-info" />
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-white">Type d'accompagnement souhaité</h3>
-            <p className="text-sm text-gray-dark">Répartition par professionnel</p>
+            <h3 className="text-base sm:text-lg font-semibold text-white">Accompagnement souhaité</h3>
+            <p className="text-xs sm:text-sm text-gray-dark">Répartition par professionnel</p>
           </div>
         </div>
-        <div className="text-right">
-          <p className="text-2xl font-bold font-mono text-white">{totalLeads}</p>
-          <p className="text-xs text-gray-dark">leads</p>
+        <div className="text-left sm:text-right flex sm:block items-center gap-2">
+          <p className="text-xl sm:text-2xl font-bold font-mono text-white">{totalLeads}</p>
+          <p className="text-xs text-gray-dark">leads total</p>
         </div>
       </div>
 
