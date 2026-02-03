@@ -33,3 +33,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </React.StrictMode>,
 )
+// Vercel deployment trigger - Tue Feb  3 12:40:29 UTC 2026
