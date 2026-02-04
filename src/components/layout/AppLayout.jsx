@@ -55,13 +55,6 @@ export default function AppLayout() {
     setMobileMenuOpen(false)
   }, [])
 
-  // Touch handler for iOS Safari — fires on touchend as fallback when onClick fails
-  const handleTouchClose = useCallback((e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    closeMobileMenu()
-  }, [closeMobileMenu])
-
   return (
     <SidebarContext.Provider value={{ collapsed, setCollapsed, isMobile }}>
       <div className="min-h-screen relative">
@@ -90,17 +83,19 @@ export default function AppLayout() {
 
         {/* ========================================= */}
         {/* MOBILE: Dark overlay when menu is open    */}
+        {/* Always in DOM to prevent click-through     */}
+        {/* on iOS Safari when conditionally removed   */}
         {/* ========================================= */}
-        {mobileMenuOpen && (
-          <div
-            className="fixed inset-0 z-40 bg-black/60 md:hidden"
-            onClick={closeMobileMenu}
-            onTouchEnd={handleTouchClose}
-            role="button"
-            tabIndex={-1}
-            aria-label="Fermer le menu"
-          />
-        )}
+        <div
+          className={`
+            fixed inset-0 z-40 bg-black/60 md:hidden
+            transition-opacity duration-300
+            ${mobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}
+          `}
+          onClick={closeMobileMenu}
+          aria-hidden={!mobileMenuOpen}
+          aria-label="Fermer le menu"
+        />
 
         {/* ========================================= */}
         {/* MOBILE: Sidebar drawer (slide from left)  */}
@@ -130,10 +125,8 @@ export default function AppLayout() {
             <button
               type="button"
               onClick={closeMobileMenu}
-              onTouchEnd={handleTouchClose}
               className="p-2 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/30 text-white transition-colors touch-manipulation"
               aria-label="Fermer le menu"
-              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               <X className="w-5 h-5" />
             </button>
