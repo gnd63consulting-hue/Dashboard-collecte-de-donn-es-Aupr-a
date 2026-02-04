@@ -37,6 +37,16 @@ export default function AppLayout() {
     setMobileMenuOpen(false)
   }, [location.pathname])
 
+  // Lock body scroll when mobile menu is open (prevents iOS scroll-through)
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [mobileMenuOpen])
+
   // Calculate unanalysed leads count
   const unanalysedCount = leads.filter(lead => !lead.analysed_at && lead.score_urgence === null).length
 
@@ -44,6 +54,13 @@ export default function AppLayout() {
   const closeMobileMenu = useCallback(() => {
     setMobileMenuOpen(false)
   }, [])
+
+  // Touch handler for iOS Safari — fires on touchend as fallback when onClick fails
+  const handleTouchClose = useCallback((e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    closeMobileMenu()
+  }, [closeMobileMenu])
 
   return (
     <SidebarContext.Provider value={{ collapsed, setCollapsed, isMobile }}>
@@ -59,7 +76,7 @@ export default function AppLayout() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(true)}
-            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-colors"
+            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-colors touch-manipulation"
             aria-label="Ouvrir le menu"
           >
             <Menu className="w-6 h-6" />
@@ -78,7 +95,10 @@ export default function AppLayout() {
           <div
             className="fixed inset-0 z-40 bg-black/60 md:hidden"
             onClick={closeMobileMenu}
-            aria-hidden="true"
+            onTouchEnd={handleTouchClose}
+            role="button"
+            tabIndex={-1}
+            aria-label="Fermer le menu"
           />
         )}
 
@@ -92,7 +112,7 @@ export default function AppLayout() {
             md:hidden fixed top-0 left-0 bottom-0 z-50
             w-64 bg-gradient-to-b from-auprea-navy-dark to-auprea-navy
             border-r border-white/10 flex flex-col shadow-2xl
-            transform transition-transform duration-300 ease-in-out
+            transition-transform duration-300 ease-in-out
             ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
           `}
         >
@@ -110,8 +130,10 @@ export default function AppLayout() {
             <button
               type="button"
               onClick={closeMobileMenu}
-              className="p-2 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/30 text-white transition-colors"
+              onTouchEnd={handleTouchClose}
+              className="p-2 rounded-lg bg-white/10 hover:bg-white/20 active:bg-white/30 text-white transition-colors touch-manipulation"
               aria-label="Fermer le menu"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               <X className="w-5 h-5" />
             </button>
