@@ -57,18 +57,10 @@ function NavItem({ item, collapsed, unanalysedCount, onClick }) {
     }
   }
 
-  // iOS Safari fallback: fire close on touchend (without preventDefault to keep NavLink navigation)
-  const handleTouchEnd = () => {
-    if (onClick) {
-      onClick()
-    }
-  }
-
   return (
     <NavLink
       to={item.path}
       onClick={handleClick}
-      onTouchEnd={handleTouchEnd}
       className={`
         flex items-center gap-3 px-4 py-3 mx-2 rounded-xl transition-all duration-200 touch-manipulation
         ${isActive
