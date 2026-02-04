@@ -61,7 +61,6 @@ function NavItem({ item, collapsed, unanalysedCount, onClick }) {
     <NavLink
       to={item.path}
       onClick={handleClick}
-      onPointerDown={onClick}
       className={`
         flex items-center gap-3 px-4 py-3 mx-2 rounded-xl transition-all duration-200
         ${isActive
