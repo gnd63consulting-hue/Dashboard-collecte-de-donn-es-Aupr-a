@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
 
 // Animated counter component
-function AnimatedCounter({ value, duration = 1000 }) {
+function AnimatedCounter({ value, duration = 1000, suffix = '', prefix = '' }) {
   const [displayValue, setDisplayValue] = useState(0)
 
   useEffect(() => {
@@ -30,13 +30,13 @@ function AnimatedCounter({ value, duration = 1000 }) {
 
   return (
     <span className="counter-animate">
-      {displayValue.toLocaleString('fr-FR')}
+      {prefix}{displayValue.toLocaleString('fr-FR')}{suffix}
     </span>
   )
 }
 
 // Mini sparkline component
-function Sparkline({ data, color = '#D4AF37' }) {
+function Sparkline({ data, color = '#D4AF37', height = 40 }) {
   if (!data || data.length === 0) return null
 
   const max = Math.max(...data, 1)
@@ -49,25 +49,27 @@ function Sparkline({ data, color = '#D4AF37' }) {
     return `${x},${y}`
   }).join(' ')
 
+  const uniqueId = `sparkline-gradient-${Math.random().toString(36).substr(2, 9)}`
+
   return (
-    <svg className="w-full h-8" viewBox="0 0 100 100" preserveAspectRatio="none">
+    <svg className="w-full" style={{ height }} viewBox="0 0 100 100" preserveAspectRatio="none">
       <defs>
-        <linearGradient id="sparkline-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor={color} stopOpacity="0.3" />
-          <stop offset="100%" stopColor={color} stopOpacity="0" />
+        <linearGradient id={uniqueId} x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor={color} stopOpacity="0.4" />
+          <stop offset="100%" stopColor={color} stopOpacity="0.05" />
         </linearGradient>
       </defs>
+      <polygon
+        points={`0,100 ${points} 100,100`}
+        fill={`url(#${uniqueId})`}
+      />
       <polyline
         points={points}
         fill="none"
         stroke={color}
-        strokeWidth="3"
+        strokeWidth="2.5"
         strokeLinecap="round"
         strokeLinejoin="round"
-      />
-      <polygon
-        points={`0,100 ${points} 100,100`}
-        fill="url(#sparkline-gradient)"
       />
     </svg>
   )
@@ -78,14 +80,17 @@ export default function KPICard({
   value,
   subtitle,
   change,
+  changeLabel = 'vs période préc.',
   icon: Icon,
   sparklineData,
   delay = 0,
   loading = false,
-  isGold = false
+  isGold = false,
+  valuePrefix = '',
+  valueSuffix = ''
 }) {
   const isPositive = change > 0
-  const isNeutral = change === 0
+  const isNeutral = change === 0 || change === undefined
 
   if (loading) {
     return (
@@ -93,11 +98,14 @@ export default function KPICard({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay }}
-        className="glass-card p-6"
+        className="stat-card stat-card-loading"
       >
-        <div className="skeleton h-4 w-24 mb-4" />
-        <div className="skeleton h-10 w-32 mb-2" />
-        <div className="skeleton h-4 w-20" />
+        <div className="stat-card-header">
+          <div className="skeleton h-4 w-24" />
+          <div className="skeleton h-12 w-12 rounded-xl" />
+        </div>
+        <div className="skeleton h-12 w-32 mt-4" />
+        <div className="skeleton h-4 w-20 mt-3" />
       </motion.div>
     )
   }
@@ -107,41 +115,33 @@ export default function KPICard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay, duration: 0.5 }}
-      whileHover={{ y: -4, transition: { duration: 0.2 } }}
-      className={`glass-card p-6 relative overflow-hidden ${
-        isGold ? 'border-auprea-gold/30 gold-glow-sm' : ''
-      }`}
+      whileHover={{ y: -6, transition: { duration: 0.25 } }}
+      className={`stat-card ${isGold ? 'stat-card-gold' : ''}`}
     >
-      {/* Background glow for gold cards */}
-      {isGold && (
-        <div className="absolute -top-10 -right-10 w-32 h-32 bg-auprea-gold/10 rounded-full blur-3xl" />
-      )}
+      {/* Header with title and icon */}
+      <div className="stat-card-header">
+        <h3 className="stat-card-title">{title}</h3>
 
-      {/* Icon */}
-      {Icon && (
-        <div className={`inline-flex p-2 rounded-lg mb-3 ${
-          isGold ? 'bg-auprea-gold/20' : 'bg-white/5'
-        }`}>
-          <Icon className={`w-5 h-5 ${isGold ? 'text-auprea-gold' : 'text-white/70'}`} />
-        </div>
-      )}
+        {Icon && (
+          <div className={`stat-card-icon ${isGold ? 'stat-card-icon-gold' : ''}`}>
+            <Icon className="w-6 h-6" />
+          </div>
+        )}
+      </div>
 
-      {/* Title */}
-      <p className="text-gray-dark text-sm font-medium mb-2">{title}</p>
+      {/* Main value */}
+      <div className="stat-card-value-container">
+        <p className={`stat-card-value ${isGold ? 'stat-card-value-gold' : ''}`}>
+          <AnimatedCounter value={value} prefix={valuePrefix} suffix={valueSuffix} />
+        </p>
+      </div>
 
-      {/* Value */}
-      <div className="flex items-end gap-3 mb-2">
-        <h3 className={`text-3xl md:text-4xl font-bold font-mono ${
-          isGold ? 'text-auprea-gold' : 'text-white'
-        }`}>
-          <AnimatedCounter value={value} />
-        </h3>
-
-        {/* Change indicator */}
-        {change !== undefined && (
-          <div className={`flex items-center gap-1 text-sm font-medium pb-1 ${
-            isPositive ? 'text-auprea-success' :
-            isNeutral ? 'text-gray-dark' : 'text-red-400'
+      {/* Change indicator */}
+      {change !== undefined && (
+        <div className="stat-card-change-container">
+          <div className={`stat-card-change ${
+            isPositive ? 'stat-card-change-positive' :
+            isNeutral ? 'stat-card-change-neutral' : 'stat-card-change-negative'
           }`}>
             {isPositive ? (
               <TrendingUp className="w-4 h-4" />
@@ -151,20 +151,33 @@ export default function KPICard({
               <TrendingDown className="w-4 h-4" />
             )}
             <span>{isPositive ? '+' : ''}{change}%</span>
+            <span className="stat-card-change-label">{changeLabel}</span>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Subtitle */}
-      {subtitle && (
-        <p className="text-gray-dark text-xs">{subtitle}</p>
+      {subtitle && !change && (
+        <p className="stat-card-subtitle">{subtitle}</p>
       )}
 
       {/* Sparkline */}
       {sparklineData && sparklineData.length > 0 && (
-        <div className="mt-4 -mx-2">
-          <Sparkline data={sparklineData} color={isGold ? '#D4AF37' : '#3B82F6'} />
+        <div className="stat-card-sparkline">
+          <Sparkline
+            data={sparklineData}
+            color={isGold ? '#D4AF37' : '#3B82F6'}
+            height={50}
+          />
         </div>
+      )}
+
+      {/* Decorative elements */}
+      {isGold && (
+        <>
+          <div className="stat-card-glow" />
+          <div className="stat-card-shine" />
+        </>
       )}
     </motion.div>
   )

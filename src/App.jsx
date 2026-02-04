@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { Users, Calendar, TrendingUp, AlertCircle } from 'lucide-react'
+import { Users, CalendarDays, TrendingUp, AlertCircle, Zap } from 'lucide-react'
 
 // Components
 import Header from './components/Header'
@@ -75,7 +75,7 @@ function App() {
         </AnimatePresence>
 
         {/* KPI Cards Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
           <KPICard
             title="Total Leads"
             value={stats.total}
@@ -89,17 +89,19 @@ function App() {
             value={stats.today}
             subtitle={`Hier : ${stats.yesterday}`}
             change={stats.todayChange}
-            icon={Calendar}
+            changeLabel="vs hier"
+            icon={Zap}
             loading={loading}
             delay={0.1}
           />
           <KPICard
-            title="Cette semaine"
+            title="Cette Semaine"
             value={stats.thisWeek}
             subtitle={`Semaine dernière : ${stats.lastWeek}`}
             change={stats.weeklyChange}
+            changeLabel="cette semaine"
             sparklineData={stats.weeklySparkline}
-            icon={TrendingUp}
+            icon={CalendarDays}
             loading={loading}
             delay={0.2}
           />
