@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 
 // ─── API & Session ──────────────────────────────────────────
-const N8N_AGENT_WEBHOOK = import.meta.env.VITE_N8N_AGENT_WEBHOOK || 'https://n8n.srv989411.hstgr.cloud/webhook/auprea-agent-chat'
+const N8N_AGENT_WEBHOOK = import.meta.env.VITE_N8N_AGENT_WEBHOOK || 'https://n8n.srv989411.hstgr.cloud/webhook/auprea-agent-chat/chat'
 
 function generateSessionId() {
   return `charles-session-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`
@@ -542,6 +542,7 @@ export default function ChatPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          action: 'sendMessage',
           chatInput: content,
           sessionId: sessionId,
         }),
