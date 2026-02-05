@@ -18,7 +18,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useLeads, useLeadStats } from '../hooks/useSupabase'
 
 // N8N webhook URL for Tristan agent
-const N8N_AGENT_WEBHOOK = import.meta.env.VITE_N8N_AGENT_WEBHOOK || 'https://n8n.srv989411.hstgr.cloud/webhook/auprea-agent-chat'
+const N8N_AGENT_WEBHOOK = import.meta.env.VITE_N8N_AGENT_WEBHOOK || 'https://n8n.srv989411.hstgr.cloud/webhook/auprea-agent-chat/chat'
 
 // Period options
 const PERIODS = [
@@ -200,6 +200,7 @@ export default function ReportsPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          action: 'sendMessage',
           chatInput: message,
           sessionId
         })
